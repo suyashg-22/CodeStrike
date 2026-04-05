@@ -1,0 +1,70 @@
+====================================================================
+               CODE STRIKE - PROJECT FEATURE LOG
+====================================================================
+
+--------------------------------------------------------------------
+DAY 3: MULTIPLAYER CORE, COMM-LINK, API POOLING & CUSTOM UI
+--------------------------------------------------------------------
+WebSockets & Matchmaking Architecture:
+- Implemented Socket.io on Express backend and React frontend.
+- Built queue system to pair users into isolated socket rooms ('matchId').
+- Added robust disconnect handling with a 10-second 'Grace Period' to allow users to refresh without forfeiting the match.
+- Synced an absolute timestamp timer across both clients.
+
+Execution Engine Enhancements:
+- Built a 5-Key API Rotation Pool for JDoodle to handle 429 (Rate Limit) and 403 (Forbidden) errors automatically, scaling capacity to 1,000 requests/day.
+- Refactored execute.js to short-circuit test loops immediately upon failure.
+- Converted database seed data to clean, Codeforces-style inputs (raw stdin) with detailed explanations.
+
+Arena UI & Custom Components:
+- Built a custom, dependency-free draggable split-pane layout using React state and DOM event listeners.
+- Implemented Dual Progress Bars syncing real-time test execution data between the player and opponent.
+- Built full 'Game Over' modal logic triggering on opponent disconnect or 100% test completion.
+- Configured React Router (App.jsx) to seamlessly link /dashboard and /arena with proper redirects.
+
+Real-Time Chat (Comm-Link):
+- Built in-game chat interface attached to the problem panel.
+- Implemented socket send_message and receive_message events confined to specific match rooms.
+- Added auto-scroll useRef hook for new messages.
+
+Audio Engine (DBZ Theme):
+- Pre-cached reliable audio assets to prevent browser blocking and latency.
+- Implemented global Dashboard BGM, teleport sounds on matchmaking, and execution/strike charging sounds.
+- Added 'Ultra Instinct' music trigger at the 7-second timer mark.
+- Handled browser autoplay policies with user-interaction listeners.
+
+--------------------------------------------------------------------
+DAY 2: MULTI-LANGUAGE EXECUTION ENGINE & GAMIFIED ARENA UI
+--------------------------------------------------------------------
+Backend & Infrastructure:
+- Seeded MongoDB with algorithmic problems and test cases via seed script.
+- Built secure /api/execute endpoint using the JDoodle API to isolate code execution.
+- Implemented multi-language support (JavaScript, C++, Python) with dynamic compiler mapping.
+- Wrote robust stdout/stdin wrappers to prevent Node.js 'status 4' segment faults.
+- Engineered multi-test-case validation logic (requires 100% pass rate for Victory).
+- Secured environment variables (JDOODLE_CLIENT_ID, JDOODLE_CLIENT_SECRET).
+
+Frontend & UI:
+- Built responsive, split-screen Battle Arena layout using Tailwind CSS.
+- Integrated @monaco-editor/react with auto-swapping language syntax and boilerplate templates.
+- Connected the frontend 'STRIKE' button to the backend compiler via Axios.
+- Gamified the console output with dynamic CSS glowing borders, spinning loaders, and Victory/Defeat banners.
+- Installed framer-motion and prepped the audio-trigger engine for future aesthetic polishing.
+
+--------------------------------------------------------------------
+DAY 1: FULL-STACK FOUNDATION & JWT AUTHENTICATION
+--------------------------------------------------------------------
+- Initialized master repository with frontend and backend architectures.
+- Backend: Configured Node/Express server and established MongoDB Atlas connection.
+- Backend: Created Mongoose schemas for Users (Elo ratings) and Problems (test cases).
+- Backend: Built /register and /login endpoints with bcrypt hashing and JWT generation.
+- Frontend: Initialized React via Vite and configured Tailwind CSS v3.
+- Frontend: Implemented React Router with Login, Dashboard, and Arena placeholder pages.
+- Full-Stack: Connected React auth forms to Express API using Axios.
+- Full-Stack: Implemented local storage caching for JWTs and successful dashboard redirection.
+
+--------------------------------------------------------------------
+INITIALIZATION
+--------------------------------------------------------------------
+- Initial commit: added frontend and backend folders.
+- Initial commit: repository setup.
