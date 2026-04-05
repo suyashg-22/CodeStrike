@@ -3,10 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Import our new Auth Routes
 const authRoutes = require('./routes/auth');
+const executeRoutes = require('./routes/execute');
 
 const app = express();
+const Problem = require('./models/Problem');
 
 // Middleware
 app.use(express.json());
@@ -18,7 +19,18 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('❌ DB Connection Error: ', err));
 
 // API Routes
-app.use('/api/auth', authRoutes); // <--- We mounted the routes here!
+app.use('/api/auth', authRoutes);
+app.use('/api/execute', executeRoutes);
+
+// Temporary route to grab a problem for testing the Arena
+app.get('/api/problems/test', async (req, res) => {
+    try {
+        const problem = await Problem.findOne(); // Grabs the first problem in the DB
+        res.status(200).json(problem);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching problem" });
+    }
+});
 
 // Basic Health Check
 app.get('/api/health', (req, res) => {
