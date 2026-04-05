@@ -2,53 +2,42 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Problem = require('./models/Problem');
 
-// The Problem Library
 const seedProblems = [
     {
         title: "Binary Search",
         difficulty: "Easy",
-        description: "Given an array of integers `nums` which is sorted in ascending order, and an integer `target`, write a function to search `target` in `nums`. If `target` exists, then return its index. Otherwise, return -1.",
-        starterCode: "function search(nums, target) {\n  // Write your code here\n}",
+        description: "Given a sorted array of N integers and a target value, return the index of the target. If not found, return -1.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\nLine 3: Target integer",
+        starterCode: "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
         testCases: [
-            { input: "[-1,0,3,5,9,12]\n9", expectedOutput: "4", isHidden: false },
-            { input: "[-1,0,3,5,9,12]\n2", expectedOutput: "-1", isHidden: false },
-            { input: "[5]\n5", expectedOutput: "0", isHidden: true },
-            { input: "[2,5]\n0", expectedOutput: "-1", isHidden: true }
-        ]
-    },
-    {
-        title: "Maximum Subarray",
-        difficulty: "Medium",
-        description: "Given an integer array `nums`, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum. Hint: Kadane's Algorithm is highly efficient here.",
-        starterCode: "function maxSubArray(nums) {\n  // Write your code here\n}",
-        testCases: [
-            { input: "[-2,1,-3,4,-1,2,1,-5,4]", expectedOutput: "6", isHidden: false },
-            { input: "[1]", expectedOutput: "1", isHidden: false },
-            { input: "[5,4,-1,7,8]", expectedOutput: "23", isHidden: true },
-            { input: "[-1]", expectedOutput: "-1", isHidden: true }
+            // Notice: Clean numbers now! "6" is the size, then the array, then "9" is the target.
+            { 
+              input: "6\n-1 0 3 5 9 12\n9", 
+              expectedOutput: "4", 
+              explanation: "n = 6.\nThe array is [-1, 0, 3, 5, 9, 12].\nThe target is 9, which is located at index 4.",
+              isHidden: false 
+            },
+            { 
+              input: "6\n-1 0 3 5 9 12\n2", 
+              expectedOutput: "-1", 
+              explanation: "n = 6.\nThe target is 2, which does not exist in the array, so we return -1.",
+              isHidden: false 
+            },
+            { input: "1\n5\n5", expectedOutput: "0", isHidden: true },
+            { input: "2\n2 5\n0", expectedOutput: "-1", isHidden: true }
         ]
     }
 ];
 
-// The Seeding Logic
 const seedDatabase = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI, { family: 4 }); // Using your IPv4 bypass
-        console.log('✅ Connected to MongoDB for seeding...');
-
-        // Clear existing problems to avoid duplicates
+        await mongoose.connect(process.env.MONGO_URI, { family: 4 });
         await Problem.deleteMany({});
-        console.log('🗑️ Cleared existing problems.');
-
-        // Insert the new problems
         await Problem.insertMany(seedProblems);
-        console.log('🌱 Successfully seeded the problem library!');
-
+        console.log('🌱 Database seeded with Codeforces-style Binary Search!');
         process.exit();
     } catch (err) {
-        console.error('❌ Seeding Error: ', err);
+        console.error(err);
         process.exit(1);
     }
 };
-
 seedDatabase();
