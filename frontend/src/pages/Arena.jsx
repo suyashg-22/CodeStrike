@@ -307,7 +307,11 @@ export default function Arena() {
               </h2>
               <p className="text-gray-300 mb-8 text-lg">{gameOver.reason}</p>
               <button 
-                onClick={() => { localStorage.removeItem('activeMatch'); navigate('/dashboard'); }}
+                onClick={() => { 
+                  playSound('button'); // <-- ADD THIS LINE!
+                  localStorage.removeItem('activeMatch'); 
+                  navigate('/dashboard'); 
+                }}
                 className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded tracking-widest uppercase transition"
               >
                 Return to Dashboard

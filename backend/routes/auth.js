@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Importing the Mongoose schema we made earlier
+const Match = require('../models/Match'); // Make sure to import the Match model!
 
 const router = express.Router();
 
@@ -38,12 +39,20 @@ router.post('/register', async (req, res) => {
         );
 
         // Send token and user data back to the frontend
+        // FIX: Ensured the key is "_id" and sent the full stats
         res.status(201).json({
             token,
-            user: { id: newUser._id, username: newUser.username, eloRating: newUser.eloRating }
+            user: { 
+                _id: newUser._id, 
+                username: newUser.username, 
+                elo: newUser.elo || 1000,
+                wins: newUser.wins || 0,
+                losses: newUser.losses || 0
+            }
         });
     } catch (err) {
-        console.error(err);
+        console.error("Registration Error:", err);
+        // FIX: Properly handle errors instead of referencing undefined variables
         res.status(500).json({ message: 'Server error during registration.' });
     }
 });
@@ -75,13 +84,65 @@ router.post('/login', async (req, res) => {
         );
 
         // Send token and user data back
+        // FIX: Ensured the key is "_id"
         res.status(200).json({
             token,
-            user: { id: user._id, username: user.username, eloRating: user.eloRating }
+            user: { 
+                _id: user._id, 
+                username: user.username, 
+                elo: user.elo || 1000,
+                wins: user.wins || 0,
+                losses: user.losses || 0
+            }
         });
     } catch (err) {
-        console.error(err);
+        console.error("Login Error:", err);
+        // FIX: Properly handle errors
         res.status(500).json({ message: 'Server error during login.' });
+    }
+});
+
+// ==========================================
+// 3. PROFILE ENDPOINT (/api/auth/profile/:id)
+// ==========================================
+router.get('/profile/:id', async (req, res) => {
+    try {
+        // 1. Get the user's stats
+        const user = await User.findById(req.params.id).select('-password');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // 2. Get their match history (populate opponent names and problem titles)
+        const history = await Match.find({ 
+            $or: [{ winnerId: user._id }, { loserId: user._id }] 
+        })
+        .populate('winnerId', 'username')
+        .populate('loserId', 'username')
+        .populate('problemId', 'title')
+        .sort({ date: -1 }) // Newest matches first
+        .limit(10); // Only grab the last 10 games
+
+        res.status(200).json({ user, history });
+    } catch (err) {
+        console.error("Profile Error:", err);
+        res.status(500).json({ message: 'Server error fetching profile' });
+    }
+});
+
+// ==========================================
+// 4. LEADERBOARD ENDPOINT (/api/auth/leaderboard)
+// ==========================================
+router.get('/leaderboard', async (req, res) => {
+    try {
+        // Find top 10 users, sort by elo descending (-1), and exclude their passwords
+        const topFighters = await User.find()
+            .sort({ elo: -1 })
+            .limit(10)
+            .select('username elo wins losses'); 
+            
+        res.status(200).json(topFighters);
+    } catch (err) {
+        console.error("Leaderboard Error:", err);
+        res.status(500).json({ message: 'Server error fetching leaderboard' });
     }
 });
 

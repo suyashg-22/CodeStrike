@@ -3,6 +3,34 @@
 ====================================================================
 
 --------------------------------------------------------------------
+Day 4: matchmaking queue, Elo progression, auth gateway, and global leaderboard
+--------------------------------------------------------------------
+Authentication & Security:
+- Built full JWT authentication gateway (/login and /register).
+- Implemented bcrypt password hashing and MongoDB user creation.
+- Secured frontend routes with localStorage token validation and automatic redirects.
+
+Smart Matchmaking Engine (The Queue):
+- Engineered an in-memory Node.js matchmaking queue, bypassing the need for Redis.
+- Implemented Elo Bracketing: restricts matchmaking to opponents within a +/- 200 Power Level radius.
+- Built Dynamic Difficulty Selector: auto-assigns Easy, Medium, or Hard algorithmic problems based on the average Elo of the matched fighters.
+
+Progression & Meta-Game (Database):
+- Created Match History MongoDB schema to permanently record fights.
+- Implemented standard Chess Elo mathematical algorithm to calculate rating exchanges based on power differentials.
+- Built robust forfeit-saving logic: 10-second grace period automatically awards victory and Elo if an opponent closes their browser tab.
+
+Dashboard & DBZ Tier System:
+- Upgraded the User Dashboard to fetch live stats, Win/Loss records, and a Recent Battles history table.
+- Engineered a 7-Tier dynamic classification system (Earthling Fighter to Angel/Ultra Instinct) that alters UI colors and glowing CSS shadows based on Elo thresholds.
+
+Global Leaderboard:
+- Built secure /api/auth/leaderboard endpoint to fetch and sort the top 10 players server-wide.
+- Designed 'Hall of Legends' UI with custom podium styling for the top 3 ranked fighters.
+- Resolved SPA audio lifecycle bugs to ensure background music transitions seamlessly between routes.
+
+
+--------------------------------------------------------------------
 DAY 3: MULTIPLAYER CORE, COMM-LINK, API POOLING & CUSTOM UI
 --------------------------------------------------------------------
 WebSockets & Matchmaking Architecture:

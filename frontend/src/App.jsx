@@ -1,28 +1,30 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Import your pages (Make sure the file paths match your folder structure!)
+// Import your pages
 import Dashboard from './pages/Dashboard';
 import Arena from './pages/Arena';
+// Make sure you have a Login component! If not, we can make a quick one.
+import Login from './pages/Login'; 
 
+import Leaderboard from './pages/LeaderBoard';
 export default function App() {
   return (
-    // BrowserRouter wraps the whole app and enables the URL changing magic
     <BrowserRouter>
       <Routes>
-        
-        {/* If someone goes to localhost:5173/, instantly redirect them to the Dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         
-        {/* The Global Dashboard Route */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* ADDED THE LOGIN ROUTE BACK */}
+        <Route path="/login" element={<Login />} />
         
-        {/* The Live Arena Route */}
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/arena" element={<Arena />} />
 
-        {/* Catch-All for 404 (If they type a weird URL, send them back to dashboard) */}
+        {/* Catch-All */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        
+
+        <Route path="/leaderboard" element={<Leaderboard />} />
+
       </Routes>
     </BrowserRouter>
   );

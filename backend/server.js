@@ -18,6 +18,9 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
+const User = require('./models/User'); // From Day 1
+const Match = require('./models/Match');
+const calculateElo = require('./utils/elo');
 
 // Middleware
 app.use(express.json());
@@ -46,54 +49,86 @@ app.get('/api/problems/:id', async (req, res) => {
 // ==========================================
 // SOCKET.IO MATCHMAKING & LIFECYCLE
 // ==========================================
-let waitingPlayer = null; 
+let matchmakingQueue = []; // UPGRADE: Now an array!
 const activeMatches = {}; 
 const socketToMatch = {}; 
-const disconnectTimeouts = {}; // Tracks the 10-second grace periods
+const disconnectTimeouts = {}; 
 
 io.on('connection', (socket) => {
     console.log(`👤 User Connected: ${socket.id}`);
 
-    // 1. Matchmaking
-    socket.on('find_match', async () => {
-        if (waitingPlayer && waitingPlayer.id !== socket.id) {
+    // 1. SMART MATCHMAKING ALGORITHM
+    socket.on('find_match', async (data) => {
+        const player = { socketId: socket.id, dbId: data.userId, elo: data.elo || 1000, socket: socket };
+
+        // Prevent duplicate entries if they click multiple times
+        if (!matchmakingQueue.find(p => p.socketId === socket.id)) {
+            matchmakingQueue.push(player);
+        }
+
+        // Scan the queue for an opponent within +/- 200 Elo
+        let opponentIndex = -1;
+        for (let i = 0; i < matchmakingQueue.length; i++) {
+            const p = matchmakingQueue[i];
+            if (p.socketId !== player.socketId && Math.abs(p.elo - player.elo) <= 200) {
+                opponentIndex = i;
+                break;
+            }
+        }
+
+        if (opponentIndex !== -1) {
+            const opponent = matchmakingQueue[opponentIndex];
+
+            // Remove BOTH from queue
+            matchmakingQueue = matchmakingQueue.filter(p => p.socketId !== player.socketId && p.socketId !== opponent.socketId);
+
             const matchId = `match_${Date.now()}`;
-            const player1 = waitingPlayer;
-            const player2 = socket;
 
             try {
-                const problems = await Problem.find();
+                // DYNAMIC DIFFICULTY ALGORITHM
+                const avgElo = (player.elo + opponent.elo) / 2;
+                let targetDifficulty = 'Easy';
+                if (avgElo >= 1400) targetDifficulty = 'Medium';
+                if (avgElo >= 1800) targetDifficulty = 'Hard';
+
+                let problems = await Problem.find({ difficulty: targetDifficulty });
+                // Fallback if no problems of that difficulty exist yet
+                if (problems.length === 0) problems = await Problem.find(); 
+
                 const randomProblem = problems[Math.floor(Math.random() * problems.length)];
                 
                 const startTime = Date.now();
-                activeMatches[matchId] = { player1: player1.id, player2: player2.id, startTime };
-                socketToMatch[player1.id] = matchId;
-                socketToMatch[player2.id] = matchId;
+                activeMatches[matchId] = { player1: opponent, player2: player, startTime, problemId: randomProblem._id };
+                socketToMatch[opponent.socketId] = matchId;
+                socketToMatch[player.socketId] = matchId;
 
-                player1.join(matchId);
-                player2.join(matchId);
+                opponent.socket.join(matchId);
+                player.socket.join(matchId);
 
                 io.to(matchId).emit('match_found', { matchId, problemId: randomProblem._id, startTime });
-                waitingPlayer = null;
+                console.log(`⚔️ Smart Match! ${player.elo} vs ${opponent.elo} (Diff: ${targetDifficulty})`);
             } catch (err) { console.error(err); }
         } else {
-            waitingPlayer = socket;
+            console.log(`📡 ${player.socketId} (${player.elo} Elo) is scanning for a worthy opponent...`);
         }
     });
 
-    // 2. Handle Reconnections (Grace Period Fix Part 1)
+    // Handle Abort Search
+    socket.on('cancel_search', () => {
+        matchmakingQueue = matchmakingQueue.filter(p => p.socketId !== socket.id);
+        console.log(`🛑 User ${socket.id} aborted search.`);
+    });
+
+    // 2. Handle Reconnections
     socket.on('rejoin_match', (matchId) => {
         if (activeMatches[matchId]) {
             socket.join(matchId);
             socketToMatch[socket.id] = matchId;
-            
-            // Cancel the instant-win timer if they reconnected in time
             if (disconnectTimeouts[matchId]) {
                 clearTimeout(disconnectTimeouts[matchId]);
                 delete disconnectTimeouts[matchId];
-                console.log(`⏱️ Saved ${matchId} from disconnect timeout. User reconnected.`);
+                console.log(`⏱️ Saved ${matchId} from disconnect timeout.`);
             }
-            
             console.log(`🔄 ${socket.id} rejoined ${matchId}`);
         }
     });
@@ -103,32 +138,69 @@ io.on('connection', (socket) => {
         socket.to(data.matchId).emit('opponent_progress', data);
     });
 
-    // 4. INSTANT WIN LOGIC
-    socket.on('player_won', (matchId) => {
+    // 4. INSTANT WIN & DATABASE SAVE
+    socket.on('player_won', async (matchId) => {
+        const match = activeMatches[matchId];
+        if (!match) return;
+
         io.to(matchId).emit('match_over', { winner: socket.id, reason: 'completed' });
+        
+        try {
+            const winnerId = match.player1.socketId === socket.id ? match.player1.dbId : match.player2.dbId;
+            const loserId = match.player1.socketId === socket.id ? match.player2.dbId : match.player1.dbId;
+
+            const winner = await User.findById(winnerId);
+            const loser = await User.findById(loserId);
+
+            if (winner && loser) {
+                const { newWinnerElo, newLoserElo, pointsExchanged } = calculateElo(winner.elo || 1000, loser.elo || 1000);
+                winner.elo = newWinnerElo; winner.wins = (winner.wins || 0) + 1; await winner.save();
+                loser.elo = newLoserElo; loser.losses = (loser.losses || 0) + 1; await loser.save();
+
+                await Match.create({ winnerId: winner._id, loserId: loser._id, problemId: match.problemId, reason: 'completed', eloChange: pointsExchanged });
+                console.log(`💾 Match Saved: ${winner.username} beat ${loser.username}. Elo Exchanged: ${pointsExchanged}`);
+            }
+        } catch (err) { console.error("Database save error:", err); }
+
         delete activeMatches[matchId]; 
     });
-    // 6. Real-Time Chat (Add this right here!)
+
+    // 5. Real-Time Chat
     socket.on('send_message', (data) => {
-        // Broadcast the message to everyone in the room EXCEPT the sender
-        socket.to(data.matchId).emit('receive_message', {
-            text: data.message,
-            sender: 'Opponent',
-            timestamp: Date.now()
-        });
+        socket.to(data.matchId).emit('receive_message', { text: data.message, sender: 'Opponent', timestamp: Date.now() });
     });
-    // 5. Handle Rage-Quits & Disconnects (Grace Period Fix Part 2)
+
+    // 6. Handle Rage-Quits & Disconnects
     socket.on('disconnect', () => {
-        if (waitingPlayer && waitingPlayer.id === socket.id) waitingPlayer = null;
+        // Remove from waiting queue if they disconnect while searching
+        matchmakingQueue = matchmakingQueue.filter(p => p.socketId !== socket.id);
         
         const matchId = socketToMatch[socket.id];
         if (matchId && activeMatches[matchId]) {
             console.log(`⚠️ User disconnected from ${matchId}. Starting 10s grace period...`);
             
-            // Give them 10 seconds to refresh the page before ending the match
-            disconnectTimeouts[matchId] = setTimeout(() => {
-                if (activeMatches[matchId]) {
+            disconnectTimeouts[matchId] = setTimeout(async () => { 
+                const match = activeMatches[matchId];
+                if (match) {
                     io.to(matchId).emit('match_over', { winner: 'opponent_quit', reason: 'disconnect' });
+                    
+                    try {
+                        const loserId = match.player1.socketId === socket.id ? match.player1.dbId : match.player2.dbId;
+                        const winnerId = match.player1.socketId === socket.id ? match.player2.dbId : match.player1.dbId;
+
+                        const winner = await User.findById(winnerId);
+                        const loser = await User.findById(loserId);
+
+                        if (winner && loser) {
+                            const { newWinnerElo, newLoserElo, pointsExchanged } = calculateElo(winner.elo || 1000, loser.elo || 1000);
+                            winner.elo = newWinnerElo; winner.wins = (winner.wins || 0) + 1; await winner.save();
+                            loser.elo = newLoserElo; loser.losses = (loser.losses || 0) + 1; await loser.save();
+
+                            await Match.create({ winnerId: winner._id, loserId: loser._id, problemId: match.problemId, reason: 'disconnect', eloChange: pointsExchanged });
+                            console.log(`💾 Forfeit Saved: ${winner.username} wins by abandonment over ${loser.username}. Elo: ${pointsExchanged}`);
+                        }
+                    } catch (err) { console.error("Disconnect DB error:", err); }
+
                     delete activeMatches[matchId];
                     delete disconnectTimeouts[matchId];
                 }
