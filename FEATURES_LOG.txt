@@ -1,6 +1,73 @@
 ====================================================================
-               CODE STRIKE - PROJECT FEATURE LOG
+CODE STRIKE - PROJECT FEATURE LOG
 ====================================================================
+
+--------------------------------------------------------------------
+DAY 6: THE CINEMATIC OVERHAUL & HOLOGRAPHIC UX ARCHITECTURE
+--------------------------------------------------------------------
+Global Aesthetic Engineering:
+- Injected custom 'Saiyan-Sans' typography engine-wide, strategically mapping it to headers and tier numbers to establish brand identity without compromising the readability of core coding data.
+- Re-architected global Z-index layers to support high-fidelity, transparent background environments (Kami's Lookout, Kame House, Tournament of Power).
+- Replaced solid background panels with advanced CSS Glassmorphism (backdrop-blur) and transparent gradients, allowing environment art to bleed organically through the UI.
+
+The Gateway (/login):
+- Completely redesigned the authentication portal, docking the login card to the left to reveal the Kami's Lookout environment.
+- Built a 'Holographic Mascot' system using Framer Motion, placing a levitating Piccolo to guard the server access point.
+- Engineered a CSS 3D-space composition featuring floating tech-stack assets (JS, Python, C++) orbiting in the background.
+- Designed a bottom-docked 'HUD' footer summarizing the platform's core mechanics (Combat, Rankings, Solo Practice).
+
+The Command Center (/dashboard):
+- Rebuilt the layout grid, compressing combat statistics and left-aligning the 'Recent Battles' array to open up the right side of the screen.
+- Built a fixed 'Goku Coding Diorama' component nested cleanly in the bottom right corner.
+- Programmed a 'Cinematic Weather Engine' using React useEffect intervals: triggers a high-Z-index lightning flash and a 3-second Shenron summoning animation every 10 seconds.
+- Integrated a secure JWT-clearing Logout protocol.
+
+The Hall of Legends (/leaderboard):
+- Re-engineered the ranking UI to utilize CSS horizontal gradients (from solid black to 100% transparent), ensuring fighter data is highly readable while perfectly revealing the background character art on the right side of the screen.
+- Built a vertical, auto-fitting 'Classifications' legend mapping the 7 DBZ Elo Tiers to their respective characters and minimum Elo requirements.
+
+The Training Grounds (/training):
+- Built dynamic environment swapping: UI loads the Hyperbolic Time Chamber background with holographic UI Goku and Vegeta 'Masters' on the menu, then shatters into the Tournament of Power background upon selecting an algorithm.
+
+The Battlefield (/arena):
+- Redesigned the execution button into a dynamic, glowing '💥 KAMEHAMEHA' trigger.
+- Embedded a translucent 'Vegito' watermark into the problem description panel using CSS mix-blend modes.
+- Engineered Reactive Character Pop-ups: 
+  -> Babidi appears in the console to mock the user upon failing test cases (auto-dismisses after 3 seconds).
+  -> Mr. Satan photobombs the Victory Modal.
+  -> King Kai and Whis trigger dynamically next to the chatbox on sent/received messages.
+
+--------------------------------------------------------------------
+DAY 5: THE TIME CHAMBER, SURRENDER PROTOCOLS, & DATA ENGINEERING
+--------------------------------------------------------------------
+Data Engineering & Curriculum Expansion:
+- Re-architected database seeding logic to dynamically read from a dedicated 'data/problems.json' file, decoupling logic from raw data.
+- Synthesized and injected 17 premium, Codeforces-style (Standard I/O) algorithms encompassing Array Manipulation, Sliding Window, HashMaps, and Matrices.
+- Ensured all injected algorithms dynamically map to the Easy, Medium, and Hard tiers utilized by the Smart Matchmaking engine.
+
+The Hyperbolic Time Chamber (Solo Practice Mode):
+- Built an isolated '/training' environment allowing fighters to practice algorithms without risking Power Level (Elo) penalties.
+- Engineered a dual-state UI component: a holographic selection menu to browse algorithms by difficulty, seamlessly transitioning into a stark-white, stress-free training arena.
+- Updated MongoDB User schema with a 'solvedProblems' array to persistently track and reward algorithm mastery.
+- Built corresponding backend APIs to fetch problem metadata and securely record completed algorithms.
+- Added multi-language support (JS, C++, Python) dropdown to the training editor.
+
+Surrender Protocols & Arena Enhancements:
+- Resolved critical React render crash caused by misaligned execution handlers.
+- Redesigned the Arena Header layout, locking the absolute-positioned timer and properly aligning the progress bars.
+- Built a custom Framer Motion 'Warning' modal for the Surrender sequence.
+- Resolved Mongoose strict-mode rejections by updating the Match.js schema to accept 'surrender' as a valid termination reason.
+- Rewrote backend Socket logic to correctly map winner/loser IDs upon forfeit, ensuring accurate Elo exchanges and match history saves.
+
+Dashboard UI/UX Optimization:
+- Smashed a critical Viewport Overflow (CSS Grid stretching) bug by locking maximum container heights (max-h-[calc(100vh-200px)]) and implementing custom internal scrollbars.
+- Restructured Dashboard navigation: relocated the Time Chamber button to the top global header alongside Rankings.
+- Upgraded the Combat Record card to a 3-column grid to display the new "Algorithms Mastered" stat.
+- Fixed layout shifting on the Matchmaking Radar by strictly defining min-heights, ensuring a smooth transition from 'Enter Arena' to the scanning loader.
+
+Audio Engine Expansions:
+- Added dedicated 'problemselect.mp3' BGM for the Time Chamber menu, utilizing React useEffect lifecycle hooks to auto-pause the music upon entering the coding view.
+- Wired heavy punch sound effects to the surrender failure state.
 
 --------------------------------------------------------------------
 Day 4: matchmaking queue, Elo progression, auth gateway, and global leaderboard

@@ -10,7 +10,7 @@ const audioCache = {
   charge: new Audio('/sounds/kame_charge.mp3'),
   victory: new Audio('/sounds/pvz-victory.mp3'),
   fail: new Audio('/sounds/dragon-ball-z-heavy-punch.mp3'),
-  menuMusic: new Audio('/sounds/problemselect.mp3') // <-- NEW: Menu Music!
+  menuMusic: new Audio('/sounds/problemselect.mp3')
 };
 
 // Set volumes and loops
@@ -42,11 +42,10 @@ export default function Training() {
       .catch(err => console.error("Failed to fetch problems list", err));
   }, []);
 
-  // 2. NEW: Control the Menu Music based on the current View
+  // 2. Control the Menu Music based on the current View
   useEffect(() => {
     if (view === 'menu') {
       audioCache.menuMusic.play().catch(() => {
-        // Fallback for browser autoplay policies
         const startMusic = () => {
           audioCache.menuMusic.play().catch(()=>{});
           document.removeEventListener('click', startMusic);
@@ -54,12 +53,10 @@ export default function Training() {
         document.addEventListener('click', startMusic);
       });
     } else {
-      // Stop music instantly when entering the Arena
       audioCache.menuMusic.pause();
       audioCache.menuMusic.currentTime = 0; 
     }
 
-    // Cleanup when leaving the Time Chamber entirely
     return () => {
       audioCache.menuMusic.pause();
     };
@@ -83,17 +80,13 @@ export default function Training() {
       .then(res => {
         setProblem(res.data);
         setMyTests(`0/${res.data.testCases.length}`);
-        
-        // Ensure the code resets to JS initially to match state
         setLanguage("javascript");
         setCode(res.data.starterCode);
-        
         setView('arena'); 
       })
       .catch(err => console.error(err));
   };
 
-  // NEW: Handle Language Changes
   const handleLanguageChange = (e) => {
     const selectedLang = e.target.value;
     setLanguage(selectedLang);
@@ -154,31 +147,64 @@ export default function Training() {
   };
 
   const getDifficultyColor = (diff) => {
-    if (diff === 'Easy') return 'text-green-600 bg-green-100 border-green-200';
-    if (diff === 'Medium') return 'text-yellow-600 bg-yellow-100 border-yellow-200';
-    return 'text-red-600 bg-red-100 border-red-200';
+    if (diff === 'Easy') return 'text-green-400 bg-green-900/30 border-green-500/50';
+    if (diff === 'Medium') return 'text-yellow-400 bg-yellow-900/30 border-yellow-500/50';
+    return 'text-red-400 bg-red-900/30 border-red-500/50';
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 text-black font-sans relative overflow-hidden">
+    <div className="flex flex-col h-screen font-sans relative overflow-hidden bg-black">
       
+      {/* FIXED: Dynamic Background Swapping */}
+      {view === 'menu' && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center z-0"
+            style={{ backgroundImage: "url('/backgrounds/hyperbolic-time-chamber.jpg')" }}
+          ></div>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-0"></div>
+
+          {/* THE TRAINING MASTERS */}
+          <motion.img 
+            animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            src="/characters/vegeta.png" 
+            className="hidden xl:block absolute bottom-0 left-4 h-[75vh] object-contain z-10 drop-shadow-[0_0_25px_rgba(59,130,246,0.6)] pointer-events-none" alt="Vegeta"
+          />
+          <motion.img 
+            animate={{ y: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            src="/characters/ultrainstinct.png" 
+            className="hidden xl:block absolute bottom-10 right-4 h-[80vh] object-contain z-10 drop-shadow-[0_0_35px_rgba(255,255,255,0.7)] pointer-events-none" alt="UI Goku"
+          />
+        </>
+      )}
+
+      {view === 'arena' && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center z-0"
+            style={{ backgroundImage: "url('/backgrounds/Tournament%20of%20Power.jpg')" }}
+          ></div>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-0"></div>
+        </>
+      )}
+
       {/* HEADER */}
-      <header className="flex justify-between items-center p-4 bg-white border-b-2 border-gray-200 h-16 shrink-0 relative z-20 shadow-sm">
-        <div className="text-xl font-black text-gray-800 tracking-widest">
-          HYPERBOLIC TIME CHAMBER
+      <header className={`flex justify-between items-center p-4 border-b h-16 shrink-0 relative z-20 shadow-sm ${view === 'menu' ? 'bg-black/40 backdrop-blur-md border-white/20' : 'bg-black/60 backdrop-blur-md border-white/10'}`}>
+        <div className="text-4xl font-saiyan tracking-widest uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600">
+          Hyperbolic Time Chamber
         </div>
         <div className="flex gap-4">
           {view === 'arena' && (
             <button 
               onClick={() => { playSound('button'); setView('menu'); }}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold tracking-widest uppercase transition-colors rounded"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold tracking-widest uppercase transition-colors rounded backdrop-blur-sm"
             >
               Back to Menu
             </button>
           )}
           <button 
             onClick={() => { playSound('button'); navigate('/dashboard'); }}
-            className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 font-bold tracking-widest uppercase transition-colors rounded"
+            className={`px-4 py-2 font-bold tracking-widest uppercase transition-colors rounded shadow-lg ${view === 'menu' ? 'bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-white' : 'bg-red-500/80 hover:bg-red-600 text-white border border-red-500'}`}
           >
             Exit Chamber
           </button>
@@ -188,30 +214,31 @@ export default function Training() {
       {/* VIEW CONTROLLER */}
       {view === 'menu' ? (
         
-        /* THE SELECTION MENU */
-        <main className="flex-1 overflow-y-auto p-10 container mx-auto">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-black text-gray-900 mb-2 uppercase tracking-widest">Select Training Module</h1>
-            <p className="text-gray-500 mb-10 font-medium">Choose an algorithm to master. Your Elo will not be affected in this environment.</p>
+        <main className="flex-1 overflow-y-auto p-4 md:p-10 container mx-auto relative z-20 custom-scrollbar">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-5xl font-saiyan tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-500 mb-2 uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] text-center">
+              Select Training Module
+            </h1>
+            <p className="text-gray-200 mb-10 font-bold tracking-wider text-center drop-shadow-md">Choose an algorithm to master. Your Elo will not be affected in this environment.</p>
             
             {problemsList.length === 0 ? (
-              <div className="text-gray-400 font-bold animate-pulse text-xl">Loading holographic database...</div>
+              <div className="text-yellow-400 font-bold animate-pulse text-xl tracking-widest text-center">Loading holographic database...</div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {problemsList.map((p) => (
                   <div 
                     key={p._id} 
-                    className="flex justify-between items-center bg-white p-6 rounded-lg border-2 border-transparent hover:border-blue-400 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                    className="flex justify-between items-center bg-black/40 backdrop-blur-md p-5 rounded-lg border border-white/10 hover:border-yellow-400 hover:bg-black/60 shadow-xl hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] transition-all cursor-pointer transform hover:-translate-y-1"
                     onClick={() => handleSelectProblem(p._id)}
                   >
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{p.title}</h3>
+                      <h3 className="text-2xl font-black text-white drop-shadow-md">{p.title}</h3>
                     </div>
                     <div className="flex items-center gap-6">
-                      <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide border ${getDifficultyColor(p.difficulty)}`}>
+                      <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border ${getDifficultyColor(p.difficulty)}`}>
                         {p.difficulty}
                       </span>
-                      <button className="text-blue-500 font-black tracking-widest uppercase text-sm hover:text-blue-700">
+                      <button className="text-yellow-400 font-black tracking-widest uppercase text-sm hover:text-yellow-300 drop-shadow-md">
                         TRAIN ➔
                       </button>
                     </div>
@@ -225,32 +252,25 @@ export default function Training() {
       ) : (
 
         /* THE ARENA TRAINING VIEW */
-        <main className="flex flex-1 overflow-hidden">
+        <main className="flex flex-1 overflow-hidden relative z-10">
           
-          {/* SUCCESS MODAL */}
           <AnimatePresence>
             {trainingComplete && (
               <motion.div 
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm"
+                className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
               >
                 <motion.div 
                   initial={{ scale: 0.8, y: 50 }} animate={{ scale: 1, y: 0 }}
-                  className="p-10 rounded-lg border-4 border-yellow-400 bg-white shadow-[0_0_100px_rgba(250,204,21,0.5)] text-center max-w-md"
+                  className="p-10 rounded-lg border-4 border-yellow-400 bg-gray-900 shadow-[0_0_100px_rgba(250,204,21,0.5)] text-center max-w-md"
                 >
                   <h2 className="text-4xl font-black mb-2 tracking-widest text-yellow-500 uppercase">LIMIT BROKEN</h2>
-                  <p className="text-gray-600 mb-8 font-bold">Algorithm Mastered.</p>
+                  <p className="text-gray-300 mb-8 font-bold">Algorithm Mastered.</p>
                   <div className="flex flex-col gap-4">
-                    <button 
-                      onClick={() => { playSound('button'); setView('menu'); }}
-                      className="bg-yellow-500 hover:bg-yellow-400 text-white font-black py-4 px-8 rounded tracking-widest uppercase transition shadow-lg"
-                    >
+                    <button onClick={() => { playSound('button'); setView('menu'); }} className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-black py-4 px-8 rounded tracking-widest uppercase transition shadow-lg" >
                       Select Next Algorithm
                     </button>
-                    <button 
-                      onClick={() => { playSound('button'); navigate('/dashboard'); }}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-8 rounded tracking-widest uppercase transition"
-                    >
+                    <button onClick={() => { playSound('button'); navigate('/dashboard'); }} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded tracking-widest uppercase transition border border-gray-500" >
                       Exit Chamber
                     </button>
                   </div>
@@ -259,36 +279,48 @@ export default function Training() {
             )}
           </AnimatePresence>
 
-          {/* LEFT: Problem Description */}
-          <section className="w-1/2 flex flex-col bg-white border-r-2 border-gray-200 overflow-y-auto p-8">
-            <h1 className="text-4xl font-black mb-4 text-gray-900">{problem.title}</h1>
-            <span className={`inline-block w-max text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide mb-8 border ${getDifficultyColor(problem.difficulty)}`}>
-              {problem.difficulty}
-            </span>
-            <div className="prose max-w-none text-gray-700 mb-10 whitespace-pre-wrap leading-relaxed font-medium">
-              {problem.description}
-            </div>
+          {/* LEFT: Problem Description (Transparent Glass) */}
+          <section className="w-1/2 flex flex-col bg-black/40 backdrop-blur-md border-r border-white/10 overflow-y-auto p-8 text-white relative">
             
-            <h3 className="text-xl font-black mb-4 text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-2">
-              Training Data
-            </h3>
-            {problem.testCases.filter(tc => !tc.isHidden).map((testCase, index) => (
-              <div key={index} className="mb-6">
-                <h4 className="font-bold text-gray-500 mb-2">Example {index + 1}:</h4>
-                <div className="bg-gray-50 border border-gray-200 rounded p-4 font-mono text-sm">
-                  <div className="text-gray-400 text-xs mb-1">Input:</div>
-                  <div className="text-gray-800 whitespace-pre-wrap mb-4">{testCase.input}</div>
-                  <div className="text-gray-400 text-xs mb-1">Output:</div>
-                  <div className="text-green-600 whitespace-pre-wrap">{testCase.expectedOutput}</div>
-                </div>
+            {/* The Holographic Watermark Character */}
+            <motion.img 
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              src="/characters/vegito.png" 
+              className="absolute bottom-0 right-0 h-[60vh] object-contain opacity-20 pointer-events-none mix-blend-screen drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] z-0"
+              alt="Vegito Watermark"
+            />
+
+            {/* Content properly z-indexed to sit above the watermark */}
+            <div className="relative z-10">
+              <h1 className="text-4xl font-black mb-4 text-white drop-shadow-md">{problem.title}</h1>
+              <span className={`inline-block w-max text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide mb-8 border ${getDifficultyColor(problem.difficulty)}`}>
+                {problem.difficulty}
+              </span>
+              <div className="prose max-w-none text-gray-200 mb-10 whitespace-pre-wrap leading-relaxed font-medium drop-shadow-md">
+                {problem.description}
               </div>
-            ))}
+              
+              <h3 className="text-xl font-black mb-4 text-gray-300 uppercase tracking-widest border-b border-white/20 pb-2">
+                Training Data
+              </h3>
+              {problem.testCases.filter(tc => !tc.isHidden).map((testCase, index) => (
+                <div key={index} className="mb-6">
+                  <h4 className="font-bold text-gray-400 mb-2">Example {index + 1}:</h4>
+                  <div className="bg-black/50 border border-white/10 rounded p-4 font-mono text-sm shadow-inner">
+                    <div className="text-gray-400 text-xs mb-1">Input:</div>
+                    <div className="text-gray-200 whitespace-pre-wrap mb-4">{testCase.input}</div>
+                    <div className="text-gray-400 text-xs mb-1">Output:</div>
+                    <div className="text-green-400 whitespace-pre-wrap">{testCase.expectedOutput}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
-          {/* RIGHT: Editor & Console */}
-          <section className="w-1/2 flex flex-col bg-[#1e1e1e]">
+          {/* RIGHT: Editor & Console (Solid black restored completely untouched!) */}
+          <section className="w-1/2 flex flex-col bg-[#1e1e1e] relative z-20">
             
-            {/* NEW: LANGUAGE SELECTOR */}
             <div className="flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700 text-sm shrink-0">
               <div className="text-gray-400 px-2 font-mono flex items-center gap-2">
                 <span>Language:</span>
