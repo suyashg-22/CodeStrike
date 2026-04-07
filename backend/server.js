@@ -35,6 +35,17 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/execute', executeRoutes);
 
+// NEW: Fetch ALL problems for the Time Chamber Menu
+app.get('/api/problems', async (req, res) => {
+    try {
+        // We use .select() to only grab the metadata, not the heavy descriptions and test cases
+        const problems = await Problem.find().select('title difficulty');
+        res.status(200).json(problems);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching problem list" });
+    }
+});
+
 // Fetch a specific problem by ID
 app.get('/api/problems/:id', async (req, res) => {
     try {
@@ -43,6 +54,35 @@ app.get('/api/problems/:id', async (req, res) => {
         res.status(200).json(problem);
     } catch (err) {
         res.status(500).json({ message: "Error fetching problem" });
+    }
+});
+
+
+// Fetch a random problem for the Time Chamber
+app.get('/api/problems/training/random', async (req, res) => {
+    try {
+        const problems = await Problem.find();
+        const randomProblem = problems[Math.floor(Math.random() * problems.length)];
+        res.status(200).json(randomProblem);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching training problem" });
+    }
+});
+
+// Record a Mastered Problem
+app.post('/api/auth/master-problem', async (req, res) => {
+    try {
+        const { userId, problemId } = req.body;
+        const user = await User.findById(userId);
+        
+        // Only add it if they haven't solved it before!
+        if (user && !user.solvedProblems.includes(problemId)) {
+            user.solvedProblems.push(problemId);
+            await user.save();
+        }
+        res.status(200).json({ message: "Algorithm Mastered" });
+    } catch (err) {
+        res.status(500).json({ message: "Error saving mastery" });
     }
 });
 
@@ -164,7 +204,46 @@ io.on('connection', (socket) => {
 
         delete activeMatches[matchId]; 
     });
+    // 4.5 SURRENDER LOGIC
+    socket.on('surrender', async (matchId) => {
+        const match = activeMatches[matchId];
+        if (!match) return;
 
+        // Calculate exactly who won and lost based on socket IDs
+        const loserSocketId = socket.id;
+        const winnerSocketId = match.player1.socketId === socket.id ? match.player2.socketId : match.player1.socketId;
+
+        // FIXED: Send the actual winner's socket.id to the frontend
+        io.to(matchId).emit('match_over', { winner: winnerSocketId, reason: 'surrender' });
+
+        try {
+            const loserId = match.player1.socketId === socket.id ? match.player1.dbId : match.player2.dbId;
+            const winnerId = match.player1.socketId === socket.id ? match.player2.dbId : match.player1.dbId;
+
+            const winner = await User.findById(winnerId);
+            const loser = await User.findById(loserId);
+
+            if (winner && loser) {
+                const { newWinnerElo, newLoserElo, pointsExchanged } = calculateElo(winner.elo || 1000, loser.elo || 1000);
+
+                winner.elo = newWinnerElo; winner.wins = (winner.wins || 0) + 1; await winner.save();
+                loser.elo = newLoserElo; loser.losses = (loser.losses || 0) + 1; await loser.save();
+
+                await Match.create({
+                    winnerId: winner._id,
+                    loserId: loser._id,
+                    problemId: match.problemId,
+                    reason: 'surrender',
+                    eloChange: pointsExchanged
+                });
+                console.log(`💾 Surrender Saved: ${loser.username} surrendered to ${winner.username}. Elo Exchanged: ${pointsExchanged}`);
+            }
+        } catch (err) {
+            console.error("Surrender Database save error:", err);
+        }
+
+        delete activeMatches[matchId];
+    });
     // 5. Real-Time Chat
     socket.on('send_message', (data) => {
         socket.to(data.matchId).emit('receive_message', { text: data.message, sender: 'Opponent', timestamp: Date.now() });

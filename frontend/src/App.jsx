@@ -8,6 +8,8 @@ import Arena from './pages/Arena';
 import Login from './pages/Login'; 
 
 import Leaderboard from './pages/LeaderBoard';
+import Training from './pages/Training';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -25,6 +27,7 @@ export default function App() {
 
         <Route path="/leaderboard" element={<Leaderboard />} />
 
+        <Route path="/training" element={<Training />} />
       </Routes>
     </BrowserRouter>
   );

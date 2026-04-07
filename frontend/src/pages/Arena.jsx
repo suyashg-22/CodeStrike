@@ -61,6 +61,8 @@ export default function Arena() {
   const [leftWidth, setLeftWidth] = useState(50); // Percentage
   const [topHeight, setTopHeight] = useState(65); // Percentage
 
+  const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false);
+
   // --- AUDIO LOGIC ---
   const playSound = (type) => {
     try {
@@ -112,7 +114,7 @@ export default function Arena() {
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', stopDrag);
   };
-
+  
   // --- LIFECYCLE & SOCKETS ---
   useEffect(() => {
     let currentMatch = matchData;
@@ -158,21 +160,26 @@ export default function Arena() {
     });
 
     socket.on('match_over', (data) => {
-      stopSound('charge'); // Just in case they were executing code when the match ended
+      stopSound('charge'); 
       
       if (data.reason === 'disconnect') {
         setGameOver({ isWinner: true, reason: 'Opponent fled the arena.' });
-        playSound('victory'); // Play Victory if opponent rage-quits!
+        playSound('victory'); 
+      } else if (data.reason === 'surrender') {
+        // NEW: Handle the Surrender UI messages
+        const isMe = data.winner === socket.id;
+        setGameOver({ 
+          isWinner: isMe, 
+          reason: isMe ? 'Opponent surrendered. You win!' : 'You surrendered the match.' 
+        });
+        if (isMe) playSound('victory'); else playSound('punch');
       } else {
         const isMe = data.winner === socket.id;
-        setGameOver({ isWinner: isMe, reason: isMe ? 'You crushed them!' : 'Opponent completed the algorithm first.' });
-        
-        // Play the correct sound based on who won
-        if (isMe) {
-          playSound('victory');
-        } else {
-          playSound('punch'); // Play a heavy hit if you lose
-        }
+        setGameOver({ 
+          isWinner: isMe, 
+          reason: isMe ? 'You crushed them!' : 'Opponent completed the algorithm first.' 
+        });
+        if (isMe) playSound('victory'); else playSound('punch');
       }
       
       localStorage.removeItem('activeMatch');
@@ -285,7 +292,24 @@ export default function Arena() {
       setIsExecuting(false);
     }
   };
+  // 1. Opens the beautiful modal and plays a warning click
+  const handleSurrenderClick = () => {
+    playSound('button');
+    setShowSurrenderConfirm(true);
+  };
 
+  // 2. Closes the modal if they change their mind
+  const cancelSurrender = () => {
+    playSound('button');
+    setShowSurrenderConfirm(false);
+  };
+
+  // 3. Actually ends the game and drops their Elo (FIXED BUG)
+  const confirmSurrender = () => {
+    playSound('punch'); // Play a heavy hit sound because they took the L
+    socket.emit('surrender', matchData.matchId); // FIXED: matchData.matchId
+    setShowSurrenderConfirm(false);
+  };
   if (!problem || !matchData) return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">Loading Arena...</div>;
 
   return (
@@ -293,6 +317,7 @@ export default function Arena() {
       
       {/* GAME OVER MODAL */}
       <AnimatePresence>
+        
         {gameOver && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -319,10 +344,44 @@ export default function Arena() {
             </motion.div>
           </motion.div>
         )}
+        {showSurrenderConfirm && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.8, y: 50 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0 }}
+              className="p-8 rounded-lg border-2 border-red-500 bg-red-950/90 shadow-[0_0_50px_rgba(239,68,68,0.4)] text-center max-w-md"
+            >
+              <h2 className="text-3xl font-black mb-4 tracking-widest text-red-500 uppercase">
+                WARNING
+              </h2>
+              <p className="text-gray-300 mb-8 text-lg leading-relaxed">
+                Are you sure you want to surrender? You will instantly forfeit this match and your Power Level will drop.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button 
+                  onClick={cancelSurrender}
+                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded tracking-widest uppercase transition"
+                >
+                  Keep Fighting
+                </button>
+                <button 
+                  onClick={confirmSurrender}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded tracking-widest uppercase transition shadow-[0_0_15px_rgba(220,38,38,0.5)]"
+                >
+                  Surrender
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* MATCH HEADER (Height: 64px) */}
       <header className="flex justify-between items-center p-4 bg-gray-800 border-b border-gray-700 h-16 shrink-0 relative z-20 shadow-md">
+        
+        {/* LEFT: Logo & Match ID */}
         <div className="text-xl font-black text-blue-500 tracking-widest flex items-center gap-3">
           CODE STRIKE
           <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50">
@@ -330,6 +389,7 @@ export default function Arena() {
           </span>
         </div>
         
+        {/* CENTER: Timer (Absolute positioned so it never shifts) */}
         <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2">
           <span className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-1">Time Remaining</span>
           <span className={`text-3xl font-mono font-black tracking-wider ${timeLeft <= 60 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
@@ -337,27 +397,35 @@ export default function Arena() {
           </span>
         </div>
 
-        {/* DUAL PROGRESS METERS */}
-        <div className="flex items-center gap-8">
+        {/* RIGHT: Surrender Button & Dual Progress Meters */}
+        <div className="flex items-center gap-6">
           
+          {/* SURRENDER BUTTON */}
+          <button 
+            onClick={handleSurrenderClick} 
+            className="px-3 py-1.5 bg-red-900/40 hover:bg-red-600 border border-red-500/50 hover:border-red-500 text-red-200 text-xs font-bold tracking-widest uppercase transition-colors rounded shadow-sm"
+          >
+            Surrender
+          </button>
+
           {/* MY PROGRESS (Blue) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="text-right">
               <div className="text-sm font-bold text-blue-400">You</div>
-              <div className="text-xs text-gray-400">Tests: {myTests}</div>
+              <div className="text-[10px] text-gray-400">Tests: {myTests}</div>
             </div>
-            <div className="w-32 h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
+            <div className="w-24 h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
               <div className="bg-blue-500 h-full transition-all duration-500 ease-out shadow-[0_0_10px_blue]" style={{ width: `${myProgress}%` }}></div>
             </div>
           </div>
 
           {/* OPPONENT PROGRESS (Red) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="text-right">
               <div className="text-sm font-bold text-red-400">Opponent</div>
-              <div className="text-xs text-gray-400">Tests: {opponentTests}</div>
+              <div className="text-[10px] text-gray-400">Tests: {opponentTests}</div>
             </div>
-            <div className="w-32 h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
+            <div className="w-24 h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
               <div className="bg-red-500 h-full transition-all duration-500 ease-out shadow-[0_0_10px_red]" style={{ width: `${opponentProgress}%` }}></div>
             </div>
           </div>

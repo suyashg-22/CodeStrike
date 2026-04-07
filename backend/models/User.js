@@ -10,7 +10,9 @@ const UserSchema = new mongoose.Schema({
     wins: { type: Number, default: 0 },
     losses: { type: Number, default: 0 },
     
+    solvedProblems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }],
     date: { type: Date, default: Date.now }
 });
+
 
 module.exports = mongoose.model('User', UserSchema);

@@ -1,0 +1,198 @@
+[
+  {
+    "title": "Two Sum",
+    "difficulty": "Easy",
+    "description": "Given an array of integers and an integer target, return the two numbers such that they add up to the target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice. Print the two numbers separated by a space in ascending order.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\nLine 3: Target integer\n\nOUTPUT FORMAT:\nTwo space-separated integers.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "4\n2 7 11 15\n9", "expectedOutput": "2 7", "explanation": "2 + 7 = 9.", "isHidden": false },
+      { "input": "3\n3 2 4\n6", "expectedOutput": "2 4", "explanation": "2 + 4 = 6.", "isHidden": false },
+      { "input": "2\n3 3\n6", "expectedOutput": "3 3", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Contains Duplicate",
+    "difficulty": "Easy",
+    "description": "Given an integer array, return 'true' if any value appears at least twice in the array, and return 'false' if every element is distinct.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\ntrue or false",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "4\n1 2 3 1", "expectedOutput": "true", "explanation": "1 appears twice.", "isHidden": false },
+      { "input": "4\n1 2 3 4", "expectedOutput": "false", "explanation": "All elements are distinct.", "isHidden": false },
+      { "input": "10\n1 1 1 3 3 4 3 2 4 2", "expectedOutput": "true", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Valid Anagram",
+    "difficulty": "Easy",
+    "description": "Given two strings S and T, return 'true' if T is an anagram of S, and 'false' otherwise.\nAn Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.\n\nINPUT FORMAT:\nLine 1: String S\nLine 2: String T\n\nOUTPUT FORMAT:\ntrue or false",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "anagram\nnagaram", "expectedOutput": "true", "explanation": "Both strings contain exactly the same letters.", "isHidden": false },
+      { "input": "rat\ncar", "expectedOutput": "false", "explanation": "The letters do not match.", "isHidden": false },
+      { "input": "a\nab", "expectedOutput": "false", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Maximum Subarray",
+    "difficulty": "Medium",
+    "description": "Given an integer array, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum. This requires O(N) time complexity (Kadane's Algorithm).\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\nA single integer representing the maximum sum.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "9\n-2 1 -3 4 -1 2 1 -5 4", "expectedOutput": "6", "explanation": "The subarray [4,-1,2,1] has the largest sum = 6.", "isHidden": false },
+      { "input": "1\n1", "expectedOutput": "1", "explanation": "Only one element.", "isHidden": false },
+      { "input": "5\n-5 -1 -3 -9 -2", "expectedOutput": "-1", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Product of Array Except Self",
+    "difficulty": "Medium",
+    "description": "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].\nYou must write an algorithm that runs in O(n) time and without using the division operation.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\nN space-separated integers.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "4\n1 2 3 4", "expectedOutput": "24 12 8 6", "explanation": "Products excluding self.", "isHidden": false },
+      { "input": "5\n-1 1 0 -3 3", "expectedOutput": "0 0 9 0 0", "explanation": "Handling zeros correctly is crucial.", "isHidden": false },
+      { "input": "2\n0 0", "expectedOutput": "0 0", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Container With Most Water",
+    "difficulty": "Medium",
+    "description": "You are given an integer array heights of length N. There are N vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).\nFind two lines that together with the x-axis form a container, such that the container contains the most water.\nReturn the maximum amount of water a container can store.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\nA single integer representing maximum volume.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "9\n1 8 6 2 5 4 8 3 7", "expectedOutput": "49", "explanation": "Max area between index 1 and 8.", "isHidden": false },
+      { "input": "2\n1 1", "expectedOutput": "1", "explanation": "Area is 1 * 1.", "isHidden": false }
+    ]
+  },
+  {
+    "title": "Trapping Rain Water",
+    "difficulty": "Hard",
+    "description": "Given N non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.\n\nINPUT FORMAT:\nLine 1: N (Number of elevation bars)\nLine 2: N space-separated integers representing heights\n\nOUTPUT FORMAT:\nA single integer representing the total trapped water.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "12\n0 1 0 2 1 0 1 3 2 1 2 1", "expectedOutput": "6", "explanation": "The elevation map traps 6 units of water in the valleys.", "isHidden": false },
+      { "input": "6\n4 2 0 3 2 5", "expectedOutput": "9", "explanation": "A deep valley traps lots of water.", "isHidden": false },
+      { "input": "3\n5 5 5", "expectedOutput": "0", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Valid Palindrome",
+    "difficulty": "Easy",
+    "description": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Given a string s, return true if it is a palindrome, or false otherwise.\n\nINPUT FORMAT:\nLine 1: A single string containing characters, spaces, and punctuation.\n\nOUTPUT FORMAT:\ntrue or false",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim();\n    if (!input) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "A man, a plan, a canal: Panama", "expectedOutput": "true", "explanation": "Converted to 'amanaplanacanalpanama', which is a palindrome.", "isHidden": false },
+      { "input": "race a car", "expectedOutput": "false", "explanation": "'raceacar' is not a palindrome.", "isHidden": false },
+      { "input": " ", "expectedOutput": "true", "explanation": "An empty string is a valid palindrome.", "isHidden": true }
+    ]
+  },
+  {
+    "title": "Best Time to Buy and Sell Stock",
+    "difficulty": "Easy",
+    "description": "You are given an array prices where prices[i] is the price of a given stock on the ith day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve.\n\nINPUT FORMAT:\nLine 1: N (Number of days)\nLine 2: N space-separated integers representing prices\n\nOUTPUT FORMAT:\nA single integer representing max profit.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "6\n7 1 5 3 6 4", "expectedOutput": "5", "explanation": "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.", "isHidden": false },
+      { "input": "5\n7 6 4 3 1", "expectedOutput": "0", "explanation": "In this case, no transactions are done and the max profit = 0.", "isHidden": false },
+      { "input": "2\n2 4", "expectedOutput": "2", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "Medium",
+    "description": "Given a string s, find the length of the longest substring without repeating characters.\n\nINPUT FORMAT:\nLine 1: A single string\n\nOUTPUT FORMAT:\nA single integer representing the length.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim();\n    if (!input) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "abcabcbb", "expectedOutput": "3", "explanation": "The answer is 'abc', with the length of 3.", "isHidden": false },
+      { "input": "bbbbb", "expectedOutput": "1", "explanation": "The answer is 'b', with the length of 1.", "isHidden": false },
+      { "input": "pwwkew", "expectedOutput": "3", "explanation": "The answer is 'wke', with the length of 3. Note that the answer must be a substring.", "isHidden": false }
+    ]
+  },
+  {
+    "title": "3Sum",
+    "difficulty": "Medium",
+    "description": "Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.\nPrint the number of unique triplets found.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\nA single integer representing the count of unique valid triplets.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "6\n-1 0 1 2 -1 -4", "expectedOutput": "2", "explanation": "The valid triplets are [-1, 0, 1] and [-1, -1, 2]. Total count is 2.", "isHidden": false },
+      { "input": "3\n0 1 1", "expectedOutput": "0", "explanation": "No triplets sum to 0.", "isHidden": false },
+      { "input": "3\n0 0 0", "expectedOutput": "1", "explanation": "Only one valid triplet.", "isHidden": true }
+    ]
+  },
+  {
+    "title": "Valid Parentheses",
+    "difficulty": "Easy",
+    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. Open brackets must be closed by the same type of brackets in the correct order.\n\nINPUT FORMAT:\nLine 1: A single string of brackets\n\nOUTPUT FORMAT:\ntrue or false",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim();\n    if (!input) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "()[]{}", "expectedOutput": "true", "explanation": "All brackets are properly closed.", "isHidden": false },
+      { "input": "(]", "expectedOutput": "false", "explanation": "Mismatched brackets.", "isHidden": false },
+      { "input": "{[]}", "expectedOutput": "true", "explanation": "Properly nested and closed.", "isHidden": true }
+    ]
+  },
+  {
+    "title": "Group Anagrams",
+    "difficulty": "Medium",
+    "description": "Given an array of strings, group the anagrams together. For this version, you must output the NUMBER of unique anagram groups found.\n\nINPUT FORMAT:\nLine 1: N (Number of strings)\nLine 2: N space-separated strings\n\nOUTPUT FORMAT:\nA single integer representing the count of unique groups.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n = parseInt(input[0]);\n    const strings = input.slice(1, n + 1);\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "6\neat tea tan ate nat bat", "expectedOutput": "3", "explanation": "Groups: [eat, tea, ate], [tan, nat], [bat]. Total = 3.", "isHidden": false },
+      { "input": "1\na", "expectedOutput": "1", "explanation": null, "isHidden": false },
+      { "input": "4\nlisten silent hello world", "expectedOutput": "3", "explanation": "listen/silent are one group, hello is two, world is three.", "isHidden": true }
+    ]
+  },
+  {
+    "title": "Top K Frequent Elements",
+    "difficulty": "Medium",
+    "description": "Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order, but for our test cases, print them in ascending order separated by a space.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: K (Frequency threshold)\nLine 3: N space-separated integers\n\nOUTPUT FORMAT:\nK space-separated integers in ascending order.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "6\n2\n1 1 1 2 2 3", "expectedOutput": "1 2", "explanation": "1 appears 3 times, 2 appears 2 times.", "isHidden": false },
+      { "input": "1\n1\n1", "expectedOutput": "1", "explanation": null, "isHidden": false },
+      { "input": "4\n1\n1 2 2 3", "expectedOutput": "2", "explanation": null, "isHidden": true }
+    ]
+  },
+  {
+    "title": "Valid Sudoku",
+    "difficulty": "Medium",
+    "description": "Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:\n1. Each row must contain the digits 1-9 without repetition.\n2. Each column must contain the digits 1-9 without repetition.\n3. Each of the nine 3 x 3 sub-boxes must contain the digits 1-9 without repetition.\n\nINPUT FORMAT:\n9 lines, each containing 9 space-separated characters. Use '0' to represent an empty cell.\n\nOUTPUT FORMAT:\ntrue or false",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (input.length < 81) return;\n    // input[0-80] contains the board\n}\nmain();",
+    "testCases": [
+      { 
+        "input": "5 3 0 0 7 0 0 0 0\n6 0 0 1 9 5 0 0 0\n0 9 8 0 0 0 0 6 0\n8 0 0 0 6 0 0 0 3\n4 0 0 8 0 3 0 0 1\n7 0 0 0 2 0 0 0 6\n0 6 0 0 0 0 2 8 0\n0 0 0 4 1 9 0 0 5\n0 0 0 0 8 0 0 7 9", 
+        "expectedOutput": "true", 
+        "explanation": "Standard valid Sudoku start.", 
+        "isHidden": false 
+      },
+      { 
+        "input": "8 3 0 0 7 0 0 0 0\n6 0 0 1 9 5 0 0 0\n0 9 8 0 0 0 0 6 0\n8 0 0 0 6 0 0 0 3\n4 0 0 8 0 3 0 0 1\n7 0 0 0 2 0 0 0 6\n0 6 0 0 0 0 2 8 0\n0 0 0 4 1 9 0 0 5\n0 0 0 0 8 0 0 7 9", 
+        "expectedOutput": "false", 
+        "explanation": "The '8' in the top-left corner conflicts with the '8' in the same column/sub-box.", 
+        "isHidden": false 
+      }
+    ]
+  },
+  {
+    "title": "Longest Consecutive Sequence",
+    "difficulty": "Medium",
+    "description": "Given an unsorted array of integers, return the length of the longest consecutive elements sequence. You must write an algorithm that runs in O(n) time.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: N space-separated integers\n\nOUTPUT FORMAT:\nA single integer representing the length.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "6\n100 4 200 1 3 2", "expectedOutput": "4", "explanation": "The sequence is [1, 2, 3, 4].", "isHidden": false },
+      { "input": "10\n0 3 7 2 5 8 4 6 0 1", "expectedOutput": "9", "explanation": null, "isHidden": false },
+      { "input": "0", "expectedOutput": "0", "explanation": "Empty array case.", "isHidden": true }
+    ]
+  },
+  {
+    "title": "Search in Rotated Sorted Array",
+    "difficulty": "Medium",
+    "description": "There is an integer array nums sorted in ascending order (with distinct values). Prior to being passed to your function, nums is possibly rotated at an unknown pivot index. Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.\n\nINPUT FORMAT:\nLine 1: N (Size of array)\nLine 2: Target integer\nLine 3: N space-separated integers (the rotated array)\n\nOUTPUT FORMAT:\nA single integer representing the index.",
+    "starterCode": "// Node.js\nconst fs = require('fs');\nfunction main() {\n    const input = fs.readFileSync(0, 'utf8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    // Write your logic here\n}\nmain();",
+    "testCases": [
+      { "input": "7\n0\n4 5 6 7 0 1 2", "expectedOutput": "4", "explanation": "0 is at index 4.", "isHidden": false },
+      { "input": "7\n3\n4 5 6 7 0 1 2", "expectedOutput": "-1", "explanation": "3 is not in the array.", "isHidden": false },
+      { "input": "1\n0\n0", "expectedOutput": "0", "explanation": null, "isHidden": true }
+    ]
+  }
+  
+]

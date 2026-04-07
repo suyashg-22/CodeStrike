@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // <-- FIXED: Added axios import
+import axios from 'axios';
 import socket from '../socket';
 
 // Pre-load Dashboard audio
@@ -95,7 +95,7 @@ export default function Dashboard() {
     };
   }, [navigate]);
 
-const handleFindMatch = () => {
+  const handleFindMatch = () => {
     setIsSearching(true);
     audioCache.teleport.currentTime = 0;
     audioCache.teleport.play().catch(() => {});
@@ -118,12 +118,27 @@ const handleFindMatch = () => {
       <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col h-full">
         
         {/* HEADER SECTION */}
-        <div className="flex justify-between items-center mb-12 border-b border-gray-800 pb-4">
+        <div className="flex justify-between items-center mb-12 border-b border-gray-800 pb-4 shrink-0">
           <h1 className="text-4xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 uppercase">
             Code Strike HQ
           </h1>
-          <div className="flex items-center gap-6">
-            {/* ADDED LEADERBOARD BUTTON */}
+          
+          {/* UPDATED NAV BUTTONS */}
+          <div className="flex items-center gap-4">
+            
+            {/* NEW: TIME CHAMBER BUTTON (Moved to Header) */}
+            <button 
+              onClick={() => {
+                audioCache.button.currentTime = 0;
+                audioCache.button.play().catch(()=>{});
+                navigate('/training');
+              }}
+              className="px-4 py-2 bg-gray-100 hover:bg-white text-gray-900 font-black rounded tracking-widest uppercase transition-colors shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+            >
+              ⏱️ Time Chamber
+            </button>
+
+            {/* LEADERBOARD BUTTON */}
             <button 
               onClick={() => {
                 audioCache.button.currentTime = 0;
@@ -135,72 +150,79 @@ const handleFindMatch = () => {
               🏆 Global Rankings
             </button>
 
-            <div className="text-right border-l border-gray-800 pl-6">
+            <div className="text-right border-l border-gray-800 pl-4">
               <div className="text-gray-400 text-sm tracking-widest uppercase">Logged in as</div>
               <div className="text-2xl font-bold text-white uppercase">{profileData?.username || 'Fighter'}</div>
             </div>
           </div>
         </div>
 
-        {/* MAIN LAYOUT: Split Screen (Stats on Left, History on Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
+        {/* MAIN LAYOUT: Split Screen */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0">
           
           {/* LEFT COLUMN: Stats & Matchmaking */}
-          <div className="lg:col-span-1 flex flex-col gap-8">
+          {/* FIX 1: Added lg:max-h-[calc(100vh-200px)] so it stops stretching */}
+          <div className="lg:col-span-1 flex flex-col gap-4 lg:max-h-[calc(100vh-200px)]">
             
             {/* POWER LEVEL (STATS) CARD */}
-            <div className="bg-gray-950 border border-gray-800 p-6 rounded-lg shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-              <h2 className="text-xl font-black text-gray-500 uppercase tracking-widest mb-6 border-b border-gray-800 pb-2">Combat Record</h2>
+            {/* FIX: Tightened padding (p-4), margins, and text sizes to save vertical space */}
+            <div className="bg-gray-950 border border-gray-800 p-4 rounded-lg shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] shrink-0">
+              <h2 className="text-lg font-black text-gray-500 uppercase tracking-widest mb-4 border-b border-gray-800 pb-2">Combat Record</h2>
               
-              {/* DYNAMIC DBZ TIER INJECTION */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <div className="text-xs text-gray-400 uppercase tracking-[0.3em] mb-1">Power Level (Elo)</div>
-                <div className={`text-6xl font-black ${getEloTier(profileData?.elo).color} ${getEloTier(profileData?.elo).shadow}`}>
+                <div className={`text-5xl font-black ${getEloTier(profileData?.elo).color} ${getEloTier(profileData?.elo).shadow}`}>
                   {profileData?.elo || 1000}
                 </div>
-                <div className={`mt-2 text-sm font-bold tracking-widest uppercase ${getEloTier(profileData?.elo).color}`}>
+                <div className={`mt-1 text-xs font-bold tracking-widest uppercase ${getEloTier(profileData?.elo).color}`}>
                   Class: {getEloTier(profileData?.elo).title}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-900 p-4 rounded border border-gray-800 text-center">
-                  <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Victories</div>
-                  <div className="text-3xl font-bold text-green-500">{profileData?.wins || 0}</div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gray-900 p-3 rounded border border-gray-800 text-center">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Mastered</div>
+                  <div className="text-xl font-bold text-yellow-500">{profileData?.solvedProblems?.length || 0}</div>
                 </div>
-                <div className="bg-gray-900 p-4 rounded border border-gray-800 text-center">
-                  <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Defeats</div>
-                  <div className="text-3xl font-bold text-red-500">{profileData?.losses || 0}</div>
+                <div className="bg-gray-900 p-3 rounded border border-gray-800 text-center">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Victories</div>
+                  <div className="text-xl font-bold text-green-500">{profileData?.wins || 0}</div>
+                </div>
+                <div className="bg-gray-900 p-3 rounded border border-gray-800 text-center">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Defeats</div>
+                  <div className="text-xl font-bold text-red-500">{profileData?.losses || 0}</div>
                 </div>
               </div>
             </div>
 
             {/* MATCHMAKING RADAR */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-950 border border-gray-800 rounded-lg">
+            {/* FIX: Shrunk min-h-[320px] to min-[200px] and reduced padding */}
+            <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-950 border border-gray-800 rounded-lg min-h-[200px] shrink-0">
               {!isSearching ? (
                 <button 
                   onClick={handleFindMatch}
-                  className="group relative w-full py-6 font-black text-2xl tracking-widest uppercase bg-blue-600 hover:bg-blue-500 text-white rounded shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all transform hover:scale-105 active:scale-95"
+                  className="group relative w-full py-4 font-black text-2xl tracking-widest uppercase bg-blue-600 hover:bg-blue-500 text-white rounded shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all transform hover:scale-105 active:scale-95"
                 >
                   Enter Arena
                   <div className="absolute inset-0 rounded bg-blue-400 blur-md opacity-0 group-hover:opacity-30 transition-opacity"></div>
                 </button>
               ) : (
-                <div className="flex flex-col items-center w-full">
-                  <div className="relative w-32 h-32 mb-8">
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  {/* FIX: Shrunk the loading spinner from w-32/h-32 to w-20/h-20 */}
+                  <div className="relative w-20 h-20 mb-4 shrink-0">
                     <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
                     <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
                     <div className="absolute inset-4 bg-blue-500/10 rounded-full animate-pulse"></div>
                   </div>
-                  <h2 className="text-2xl font-bold text-blue-400 animate-pulse tracking-widest text-center">
+                  <h2 className="text-xl font-bold text-blue-400 animate-pulse tracking-widest text-center shrink-0">
                     SCANNING...
                   </h2>
                   <button 
                     onClick={() => {
                       setIsSearching(false);
-                      socket.emit('cancel_search'); // <-- ADD THIS LINE!
+                      socket.emit('cancel_search');
                     }}
-                    className="mt-6 text-sm text-gray-500 hover:text-red-400 transition underline tracking-widest"
+                    className="mt-4 text-xs text-gray-500 hover:text-red-400 transition underline tracking-widest shrink-0"
                   >
                     ABORT SEARCH
                   </button>
@@ -211,8 +233,9 @@ const handleFindMatch = () => {
           </div>
 
           {/* RIGHT COLUMN: Match History */}
-          <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-lg p-6 flex flex-col overflow-hidden">
-            <h2 className="text-xl font-black text-gray-500 uppercase tracking-widest mb-6 border-b border-gray-800 pb-2">Recent Battles</h2>
+          {/* FIX 3: Added lg:max-h-[calc(100vh-200px)] so it forces the scrollbar to appear instead of stretching the page */}
+          <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-lg p-6 flex flex-col overflow-hidden lg:max-h-[calc(100vh-200px)] min-h-[500px]">
+            <h2 className="text-xl font-black text-gray-500 uppercase tracking-widest mb-6 border-b border-gray-800 pb-2 shrink-0">Recent Battles</h2>
             
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
               {matchHistory.length === 0 ? (
@@ -222,7 +245,6 @@ const handleFindMatch = () => {
               ) : (
                 <div className="space-y-3">
                   {matchHistory.map((match) => {
-                    // Determine if the logged-in user won this match
                     const user = JSON.parse(localStorage.getItem('user'));
                     const isWinner = match.winnerId._id === user._id;
                     const opponent = isWinner ? match.loserId.username : match.winnerId.username;
