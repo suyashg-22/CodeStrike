@@ -7,7 +7,7 @@ import Arena from './pages/Arena';
 // Make sure you have a Login component! If not, we can make a quick one.
 import Login from './pages/Login'; 
 
-import Leaderboard from './pages/LeaderBoard';
+import Leaderboard from './pages/Leaderboard';
 import Training from './pages/Training';
 
 export default function App() {
