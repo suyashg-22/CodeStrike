@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", 
+    origin: "*", 
     methods: ["GET", "POST"]
   }
 });
@@ -24,7 +24,9 @@ const calculateElo = require('./utils/elo');
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "*" // UPDATED: Allows Express API calls from anywhere
+}));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
