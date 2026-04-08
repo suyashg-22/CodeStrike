@@ -37,7 +37,7 @@ export default function Training() {
 
   // 1. Fetch all algorithms on load
   useEffect(() => {
-    axios.get('http://localhost:5000/api/problems')
+    axios.get('https://code-strike-backend.onrender.com/api/problems')
       .then(res => setProblemsList(res.data))
       .catch(err => console.error("Failed to fetch problems list", err));
   }, []);
@@ -76,7 +76,7 @@ export default function Training() {
     setTestStatus(null);
     setMyProgress(0);
     
-    axios.get(`http://localhost:5000/api/problems/${id}`)
+    axios.get(`https://code-strike-backend.onrender.com/api/problems/${id}`)
       .then(res => {
         setProblem(res.data);
         setMyTests(`0/${res.data.testCases.length}`);
@@ -108,7 +108,7 @@ export default function Training() {
     setTestStatus(null);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/execute', {
+      const res = await axios.post('https://code-strike-backend.onrender.com/api/execute', {
         problemId: problem._id, code, language
       });
       
@@ -127,7 +127,7 @@ export default function Training() {
           
           const user = JSON.parse(localStorage.getItem('user'));
           if (user) {
-            await axios.post('http://localhost:5000/api/auth/master-problem', {
+            await axios.post('https://code-strike-backend.onrender.com/api/auth/master-problem', {
               userId: user._id,
               problemId: problem._id
             });

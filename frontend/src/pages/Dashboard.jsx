@@ -38,7 +38,7 @@ export default function Dashboard() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-      axios.get(`http://localhost:5000/api/auth/profile/${user._id}`)
+      axios.get(`https://code-strike-backend.onrender.com/api/auth/profile/${user._id}`)
         .then(res => {
           setProfileData(res.data.user);
           setMatchHistory(res.data.history);

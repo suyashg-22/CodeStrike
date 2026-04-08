@@ -126,7 +126,7 @@ export default function Arena() {
     socket.emit('rejoin_match', currentMatch.matchId);
     const startTime = currentMatch.startTime || Date.now();
 
-    axios.get(`http://localhost:5000/api/problems/${currentMatch.problemId}`)
+    axios.get(`https://code-strike-backend.onrender.com/api/problems/${currentMatch.problemId}`)
       .then(res => {
         setProblem(res.data);
         setOpponentTests(`0/${res.data.testCases.length}`);
@@ -256,7 +256,7 @@ export default function Arena() {
     setShowBabidi(false); // Hide Babidi instantly when a new test starts
 
     try {
-      const res = await axios.post('http://localhost:5000/api/execute', { problemId: problem._id, code, language });
+      const res = await axios.post('https://code-strike-backend.onrender.com/api/execute', { problemId: problem._id, code, language });
       
       stopSound('charge'); 
       setOutput(res.data.output || res.data.message);

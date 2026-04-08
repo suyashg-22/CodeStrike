@@ -39,7 +39,7 @@ export default function Leaderboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/auth/leaderboard')
+    axios.get('https://code-strike-backend.onrender.com/api/auth/leaderboard')
       .then(res => {
         setFighters(res.data);
         setIsLoading(false);

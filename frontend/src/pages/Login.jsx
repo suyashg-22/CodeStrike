@@ -64,7 +64,7 @@ export default function Login() {
     const endpoint = isLoginView ? '/login' : '/register';
 
     try {
-      const res = await axios.post(`http://localhost:5000/api/auth${endpoint}`, formData);
+      const res = await axios.post(`https://code-strike-backend.onrender.com/api/auth${endpoint}`, formData);
       const userData = res.data.user;
       
       if (!userData || !userData._id) {
