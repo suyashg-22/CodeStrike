@@ -18,8 +18,6 @@
 
 ## 📸 Platform Gallery
 
-*(Add your screenshots here! Just replace the placeholder URLs with your actual image links)*
-
 | The Gateway (Login) | Command Center (Dashboard) |
 | :---: | :---: |
 | <img src="https://github.com/user-attachments/assets/2282453d-8eda-44e6-bf71-09c424495735" width="400" alt="Login Screen"/> | <img src="https://github.com/user-attachments/assets/2c9d1957-fe79-4b43-b2ba-fb4b87e88167" width="400" alt="Dashboard Screen"/> |
