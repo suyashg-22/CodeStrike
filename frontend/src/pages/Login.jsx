@@ -24,13 +24,20 @@ export default function Login() {
 
     if (token && user && user !== "undefined") {
       navigate('/dashboard');
+      return; 
     }
 
+    // 1. Define the fallback function
     const startAudio = () => {
       audioCache.bgm.play().catch(() => { });
       document.removeEventListener('click', startAudio);
     };
-    document.addEventListener('click', startAudio);
+
+    // 2. Try to play the music IMMEDIATELY
+    audioCache.bgm.play().catch(() => {
+      // 3. If the browser blocks autoplay, attach the click listener
+      document.addEventListener('click', startAudio);
+    });
 
     return () => {
       document.removeEventListener('click', startAudio);

@@ -72,7 +72,12 @@ export default function Dashboard() {
       audioCache.bgm.pause();
       audioCache.bgm.currentTime = 0;
       navigate('/arena', {
-        state: { matchId: data.matchId, problemId: data.problemId, startTime: data.startTime }
+        state: { 
+          matchId: data.matchId, 
+          problemId: data.problemId, 
+          startTime: data.startTime,
+          duration: data.duration // <-- NEW: Passes the time limit to the Arena!
+        }
       });
     };
 

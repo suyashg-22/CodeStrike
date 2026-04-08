@@ -3,7 +3,28 @@ CODE STRIKE - PROJECT FEATURE LOG
 ====================================================================
 
 --------------------------------------------------------------------
-DAY 6: THE CINEMATIC OVERHAUL & HOLOGRAPHIC UX ARCHITECTURE
+THE DYNAMIC MATCHMAKING ENGINE & SERVER LOOP UPGRADE
+--------------------------------------------------------------------
+Matchmaking Optimization:
+- Abstracted matchmaking resolution logic away from instantaneous, synchronous Socket.io events.
+- Engineered a continuous Matchmaking Loop (Tick Engine) that iterates across the waiting queue every 2000 milliseconds to analyze and pair combatants.
+
+Expanding Search Radius System:
+- Programmed dynamic Elo-range expansion to prevent infinite queue times for isolated rank tiers.
+- 0 to 10 Seconds: Strict pairing (± 200 Elo).
+- 10 to 20 Seconds: Moderate expansion (± 400 Elo).
+- 20+ Seconds: Total barrier removal (± Infinity) to guarantee rapid match initiation.
+
+Dynamic Temporal Limits:
+- Replaced the hardcoded 15-minute global timer with an algorithm-dependent timing engine.
+- Match duration is now dynamically generated based on the average Elo of the paired fighters:
+  -> Beginner Matches (<1400 Elo): Easy algorithm selected, 10-Minute timer applied.
+  -> Advanced Matches (1400 - 1800 Elo): Medium algorithm selected, 20-Minute timer applied.
+  -> Elite Matches (1800+ Elo): Hard algorithm selected, 30-Minute timer applied.
+- Plumbed the generated `duration` variable from the Node.js backend through the React Router `location.state` to securely initialize the Arena clock.
+
+--------------------------------------------------------------------
+THE CINEMATIC OVERHAUL & HOLOGRAPHIC UX ARCHITECTURE
 --------------------------------------------------------------------
 Global Aesthetic Engineering:
 - Injected custom 'Saiyan-Sans' typography engine-wide, strategically mapping it to headers and tier numbers to establish brand identity without compromising the readability of core coding data.
@@ -38,7 +59,7 @@ The Battlefield (/arena):
   -> King Kai and Whis trigger dynamically next to the chatbox on sent/received messages.
 
 --------------------------------------------------------------------
-DAY 5: THE TIME CHAMBER, SURRENDER PROTOCOLS, & DATA ENGINEERING
+THE TIME CHAMBER, SURRENDER PROTOCOLS, & DATA ENGINEERING
 --------------------------------------------------------------------
 Data Engineering & Curriculum Expansion:
 - Re-architected database seeding logic to dynamically read from a dedicated 'data/problems.json' file, decoupling logic from raw data.
@@ -70,7 +91,7 @@ Audio Engine Expansions:
 - Wired heavy punch sound effects to the surrender failure state.
 
 --------------------------------------------------------------------
-Day 4: matchmaking queue, Elo progression, auth gateway, and global leaderboard
+matchmaking queue, Elo progression, auth gateway, and global leaderboard
 --------------------------------------------------------------------
 Authentication & Security:
 - Built full JWT authentication gateway (/login and /register).
@@ -98,7 +119,7 @@ Global Leaderboard:
 
 
 --------------------------------------------------------------------
-DAY 3: MULTIPLAYER CORE, COMM-LINK, API POOLING & CUSTOM UI
+MULTIPLAYER CORE, COMM-LINK, API POOLING & CUSTOM UI
 --------------------------------------------------------------------
 WebSockets & Matchmaking Architecture:
 - Implemented Socket.io on Express backend and React frontend.
@@ -129,7 +150,7 @@ Audio Engine (DBZ Theme):
 - Handled browser autoplay policies with user-interaction listeners.
 
 --------------------------------------------------------------------
-DAY 2: MULTI-LANGUAGE EXECUTION ENGINE & GAMIFIED ARENA UI
+MULTI-LANGUAGE EXECUTION ENGINE & GAMIFIED ARENA UI
 --------------------------------------------------------------------
 Backend & Infrastructure:
 - Seeded MongoDB with algorithmic problems and test cases via seed script.
@@ -147,7 +168,7 @@ Frontend & UI:
 - Installed framer-motion and prepped the audio-trigger engine for future aesthetic polishing.
 
 --------------------------------------------------------------------
-DAY 1: FULL-STACK FOUNDATION & JWT AUTHENTICATION
+FULL-STACK FOUNDATION & JWT AUTHENTICATION
 --------------------------------------------------------------------
 - Initialized master repository with frontend and backend architectures.
 - Backend: Configured Node/Express server and established MongoDB Atlas connection.

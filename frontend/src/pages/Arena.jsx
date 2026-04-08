@@ -43,7 +43,7 @@ export default function Arena() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [testStatus, setTestStatus] = useState(null);
 
-  const [timeLeft, setTimeLeft] = useState(15 * 60);
+  const [timeLeft, setTimeLeft] = useState(() => matchData?.duration || 15 * 60);
   const [opponentProgress, setOpponentProgress] = useState(0);
   const [opponentTests, setOpponentTests] = useState("0/0");
   const [gameOver, setGameOver] = useState(null);
@@ -137,7 +137,10 @@ export default function Arena() {
 
     const timer = setInterval(() => {
       const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
-      const remaining = Math.max(0, (15 * 60) - elapsedSeconds);
+      // NEW: Reads dynamic duration (fallback to 15m just in case)
+      const matchDuration = currentMatch.duration || (15 * 60); 
+      const remaining = Math.max(0, matchDuration - elapsedSeconds);
+      
       setTimeLeft(remaining);
       
       if (remaining === 7) {
