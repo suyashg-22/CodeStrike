@@ -7,6 +7,8 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
 
+### 🌍 [PLAY CODE STRIKE LIVE HERE](https://code-strike.vercel.app)
+
 **Code Strike** is a high-octane, 1v1 real-time competitive programming platform heavily inspired by the aesthetics and energy of Dragon Ball Z. 
 
 ### 🐉 The Problem & The Solution
@@ -77,7 +79,7 @@ Instead of basic queuing, Code Strike uses a highly engineered **Background Tick
 
 ---
 
-## ⚙️ Installation & Setup
+## ⚙️ Local Installation & Setup
 
 ### Prerequisites
 * Node.js (v16+)
@@ -86,8 +88,8 @@ Instead of basic queuing, Code Strike uses a highly engineered **Background Tick
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/yourusername/code-strike.git](https://github.com/yourusername/code-strike.git)
-cd code-strike
+git clone [https://github.com/suyashg-22/CodeStrike.git](https://github.com/suyashg-22/CodeStrike.git)
+cd CodeStrike
 ```
 
 ### 2. Backend Setup

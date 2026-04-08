@@ -3,6 +3,28 @@ CODE STRIKE - PROJECT FEATURE LOG
 ====================================================================
 
 --------------------------------------------------------------------
+CLOUD DEPLOYMENT, STATE PERSISTENCE & PRODUCTION ROUTING
+--------------------------------------------------------------------
+Cloud Deployment Architecture:
+- Deployed the React frontend to Vercel for highly optimized global edge delivery.
+- Deployed the Node.js/Socket.io backend as a continuous Web Service on Render to maintain persistent multiplayer connections.
+- Configured MongoDB Atlas network access (0.0.0.0/0) to accept traffic from cloud computing instances.
+
+Production Security & Networking:
+- Updated Express and Socket.io CORS policies to strictly accept cross-origin requests from the Vercel production domain.
+- Upgraded WebSocket connection protocols from ws:// to wss:// (HTTPS) to resolve strict browser Mixed Content blocks.
+- Engineered a custom `vercel.json` rewrite configuration to funnel all wildcard routes back to `index.html`, eliminating 404 errors during React Router SPA navigations and manual page refreshes.
+
+State Persistence (Hyperbolic Time Chamber):
+- Smashed a critical state-loss bug occurring upon browser refreshes mid-training.
+- Built a localized caching engine using `localStorage` to continuously auto-save the user's active problem, code buffer, and language selection.
+- Designed lazy-initialization state hooks (`useState`) to instantly rehydrate the training arena from local memory on component mount.
+
+Audio Autoplay Policy Handling:
+- Resolved silent-fail errors caused by modern browser Autoplay Policies on the Login screen.
+- Implemented a dual-layered audio execution wrapper: attempts an immediate play sequence, catches DOM exceptions, and falls back to a hidden 'click' event listener to seamlessly trigger background music upon the first user interaction.
+
+--------------------------------------------------------------------
 THE DYNAMIC MATCHMAKING ENGINE & SERVER LOOP UPGRADE
 --------------------------------------------------------------------
 Matchmaking Optimization:
