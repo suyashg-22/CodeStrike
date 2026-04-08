@@ -13,7 +13,6 @@ const audioCache = {
   menuMusic: new Audio('/sounds/problemselect.mp3')
 };
 
-// Set volumes and loops
 audioCache.charge.volume = 0.9;
 audioCache.menuMusic.volume = 0.7;
 audioCache.menuMusic.loop = true;
@@ -21,17 +20,33 @@ audioCache.menuMusic.loop = true;
 export default function Training() {
   const navigate = useNavigate();
   
-  // -- STATE --
-  const [view, setView] = useState('menu'); // 'menu' or 'arena'
+  // -- FIXED STATE: Lazy Initialization from LocalStorage --
+  const [view, setView] = useState(() => {
+    return localStorage.getItem('activeTraining') ? 'arena' : 'menu';
+  });
+  const [problem, setProblem] = useState(() => {
+    const saved = localStorage.getItem('activeTraining');
+    return saved ? JSON.parse(saved).problem : null;
+  });
+  const [code, setCode] = useState(() => {
+    const saved = localStorage.getItem('activeTraining');
+    return saved ? JSON.parse(saved).code : "";
+  });
+  const [language, setLanguage] = useState(() => {
+    const saved = localStorage.getItem('activeTraining');
+    return saved ? JSON.parse(saved).language : "javascript";
+  });
+
   const [problemsList, setProblemsList] = useState([]);
-  
-  const [problem, setProblem] = useState(null);
-  const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("javascript");
   const [output, setOutput] = useState("Time Chamber ready...");
   const [isExecuting, setIsExecuting] = useState(false);
   const [testStatus, setTestStatus] = useState(null);
-  const [myTests, setMyTests] = useState("0/0");
+  
+  // Set initial tests display based on if a problem is loaded
+  const [myTests, setMyTests] = useState(() => {
+    const saved = localStorage.getItem('activeTraining');
+    return saved ? `0/${JSON.parse(saved).problem.testCases.length}` : "0/0";
+  });
   const [myProgress, setMyProgress] = useState(0);
   const [trainingComplete, setTrainingComplete] = useState(false);
 
@@ -56,11 +71,15 @@ export default function Training() {
       audioCache.menuMusic.pause();
       audioCache.menuMusic.currentTime = 0; 
     }
-
-    return () => {
-      audioCache.menuMusic.pause();
-    };
+    return () => audioCache.menuMusic.pause();
   }, [view]);
+
+  // NEW: 3. Auto-Save Progress to LocalStorage!
+  useEffect(() => {
+    if (view === 'arena' && problem) {
+      localStorage.setItem('activeTraining', JSON.stringify({ problem, code, language }));
+    }
+  }, [code, language, problem, view]);
 
   const playSound = (type) => {
     try {
@@ -78,11 +97,19 @@ export default function Training() {
     
     axios.get(`https://code-strike-backend.onrender.com/api/problems/${id}`)
       .then(res => {
-        setProblem(res.data);
-        setMyTests(`0/${res.data.testCases.length}`);
+        const fetchedProblem = res.data;
+        setProblem(fetchedProblem);
+        setMyTests(`0/${fetchedProblem.testCases.length}`);
         setLanguage("javascript");
-        setCode(res.data.starterCode);
+        setCode(fetchedProblem.starterCode);
         setView('arena'); 
+
+        // Instantly save to local storage
+        localStorage.setItem('activeTraining', JSON.stringify({
+          problem: fetchedProblem,
+          language: "javascript",
+          code: fetchedProblem.starterCode
+        }));
       })
       .catch(err => console.error(err));
   };
@@ -146,6 +173,13 @@ export default function Training() {
     }
   };
 
+  // Helper function to safely clear the session
+  const clearTrainingSession = () => {
+    playSound('button');
+    localStorage.removeItem('activeTraining');
+    setView('menu');
+  };
+
   const getDifficultyColor = (diff) => {
     if (diff === 'Easy') return 'text-green-400 bg-green-900/30 border-green-500/50';
     if (diff === 'Medium') return 'text-yellow-400 bg-yellow-900/30 border-yellow-500/50';
@@ -155,7 +189,6 @@ export default function Training() {
   return (
     <div className="flex flex-col h-screen font-sans relative overflow-hidden bg-black">
       
-      {/* FIXED: Dynamic Background Swapping */}
       {view === 'menu' && (
         <>
           <div 
@@ -164,7 +197,6 @@ export default function Training() {
           ></div>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-0"></div>
 
-          {/* THE TRAINING MASTERS */}
           <motion.img 
             animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             src="/characters/vegeta.png" 
@@ -196,14 +228,14 @@ export default function Training() {
         <div className="flex gap-4">
           {view === 'arena' && (
             <button 
-              onClick={() => { playSound('button'); setView('menu'); }}
+              onClick={clearTrainingSession} // FIXED: Clears cache when going back
               className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold tracking-widest uppercase transition-colors rounded backdrop-blur-sm"
             >
               Back to Menu
             </button>
           )}
           <button 
-            onClick={() => { playSound('button'); navigate('/dashboard'); }}
+            onClick={() => { playSound('button'); localStorage.removeItem('activeTraining'); navigate('/dashboard'); }} // FIXED: Clears cache on exit
             className={`px-4 py-2 font-bold tracking-widest uppercase transition-colors rounded shadow-lg ${view === 'menu' ? 'bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-white' : 'bg-red-500/80 hover:bg-red-600 text-white border border-red-500'}`}
           >
             Exit Chamber
@@ -267,10 +299,10 @@ export default function Training() {
                   <h2 className="text-4xl font-black mb-2 tracking-widest text-yellow-500 uppercase">LIMIT BROKEN</h2>
                   <p className="text-gray-300 mb-8 font-bold">Algorithm Mastered.</p>
                   <div className="flex flex-col gap-4">
-                    <button onClick={() => { playSound('button'); setView('menu'); }} className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-black py-4 px-8 rounded tracking-widest uppercase transition shadow-lg" >
+                    <button onClick={clearTrainingSession} className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-black py-4 px-8 rounded tracking-widest uppercase transition shadow-lg" >
                       Select Next Algorithm
                     </button>
-                    <button onClick={() => { playSound('button'); navigate('/dashboard'); }} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded tracking-widest uppercase transition border border-gray-500" >
+                    <button onClick={() => { playSound('button'); localStorage.removeItem('activeTraining'); navigate('/dashboard'); }} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded tracking-widest uppercase transition border border-gray-500" >
                       Exit Chamber
                     </button>
                   </div>
@@ -279,10 +311,9 @@ export default function Training() {
             )}
           </AnimatePresence>
 
-          {/* LEFT: Problem Description (Transparent Glass) */}
-          <section className="w-1/2 flex flex-col bg-black/40 backdrop-blur-md border-r border-white/10 overflow-y-auto p-8 text-white relative">
+          {/* LEFT: Problem Description */}
+          <section className="w-1/2 flex flex-col bg-black/40 backdrop-blur-md border-r border-white/10 overflow-y-auto p-8 text-white relative custom-scrollbar">
             
-            {/* The Holographic Watermark Character */}
             <motion.img 
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -291,7 +322,6 @@ export default function Training() {
               alt="Vegito Watermark"
             />
 
-            {/* Content properly z-indexed to sit above the watermark */}
             <div className="relative z-10">
               <h1 className="text-4xl font-black mb-4 text-white drop-shadow-md">{problem.title}</h1>
               <span className={`inline-block w-max text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide mb-8 border ${getDifficultyColor(problem.difficulty)}`}>
@@ -318,7 +348,7 @@ export default function Training() {
             </div>
           </section>
 
-          {/* RIGHT: Editor & Console (Solid black restored completely untouched!) */}
+          {/* RIGHT: Editor & Console */}
           <section className="w-1/2 flex flex-col bg-[#1e1e1e] relative z-20">
             
             <div className="flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700 text-sm shrink-0">
